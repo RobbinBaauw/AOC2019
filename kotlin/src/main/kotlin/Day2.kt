@@ -81,7 +81,7 @@ class Day2 {
 
 fun main() {
 
-    val input = Scanner(Day2::class.java.getResourceAsStream("Day2Input")).useDelimiter(",")
+    val input = Scanner(Day2::class.java.getResourceAsStream("Day2Input")).useDelimiter("[,\n]")
 
     val inputList: MutableList<Int> = ArrayList()
     while (input.hasNextInt()) {
