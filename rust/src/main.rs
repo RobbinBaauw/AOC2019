@@ -3,7 +3,7 @@
 
 use std::error::Error;
 
-mod day7;
+mod day8;
 
 fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
