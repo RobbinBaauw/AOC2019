@@ -4,13 +4,13 @@ import kotlin.collections.ArrayList
 
 class Day7 {
     companion object {
-        fun solveDay7Part1(input: List<Int>) {
+        fun solveDay7Part1(input: List<Long>) {
 
-            val permutations = mutableListOf<MutableList<Int>>()
+            val permutations = mutableListOf<MutableList<Long>>()
             getPermutations(5, mutableListOf(0, 1, 2, 3, 4), permutations)
 
-            val outputList = ArrayList<Int>()
-            var largestSignal = 0
+            val outputList = ArrayList<Long>()
+            var largestSignal = 0L
 
             permutations.forEach {
                 it.add(1, 0)
@@ -31,13 +31,13 @@ class Day7 {
             println(largestSignal)
         }
 
-        fun solveDay7Part2(input: List<Int>) {
+        fun solveDay7Part2(input: List<Long>) {
 
-            val permutations = mutableListOf<MutableList<Int>>()
+            val permutations = mutableListOf<MutableList<Long>>()
             getPermutations(5, mutableListOf(5, 6, 7, 8, 9), permutations)
 
-            val outputList = ArrayList<Int>()
-            var largestSignal = 0
+            val outputList = ArrayList<Long>()
+            var largestSignal = 0L
 
             for (permutation in permutations) {
                 val permutationCopy = permutation.toMutableList()
@@ -74,8 +74,8 @@ class Day7 {
 
         private fun getPermutations(
             n: Int,
-            inputElements: MutableList<Int>,
-            outputList: MutableList<MutableList<Int>>
+            inputElements: MutableList<Long>,
+            outputList: MutableList<MutableList<Long>>
         ) {
             if (n == 1) {
                 outputList.add(ArrayList(inputElements))
@@ -98,9 +98,9 @@ fun main() {
 
     val input = Scanner(Day7::class.java.getResourceAsStream("Day7Input")).useDelimiter("[,\n]")
 
-    val inputList: MutableList<Int> = ArrayList()
-    while (input.hasNextInt()) {
-        inputList.add(input.nextInt())
+    val inputList: MutableList<Long> = ArrayList()
+    while (input.hasNextLong()) {
+        inputList.add(input.nextLong())
     }
 
 //    Day7.solveDay7Part1(inputList)
