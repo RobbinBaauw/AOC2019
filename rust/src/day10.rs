@@ -79,9 +79,11 @@ pub fn part2(pixels: &mut Vec<(isize, isize)>, start_pixel: (isize, isize)) -> O
 
         vaporized += 1;
 
+        angles.remove(angle_index);
+        angle_index %= angles.len();
+
         loop {
             let next_angle = angles.get(angle_index)?.0;
-            angle_index %= angles.len();
 
             if curr_angle != next_angle {
                 break;
@@ -92,7 +94,7 @@ pub fn part2(pixels: &mut Vec<(isize, isize)>, start_pixel: (isize, isize)) -> O
         }
     }
 
-    Some(1)
+    None
 }
 
 fn is_in_line(a: &(isize, isize), b: &(isize, isize), target: &(isize, isize)) -> bool {
@@ -154,14 +156,6 @@ mod tests {
     fn p2() {
         let mut input = parse_input(include_str!("day10"));
         let i = part2(input.as_mut(), (11, 11));
-        assert_eq!(i, Some(1));
+        assert_eq!(i, Some(806));
     }
-
-    #[test]
-    fn test1() {
-        let input = parse_input("123456789012");
-        let i = part1(&input);
-        assert_eq!(i, 1);
-    }
-
 }
