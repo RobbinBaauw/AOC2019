@@ -23,6 +23,9 @@ class Day11 {
         fun solveDay11Part1(input: List<Long>): Int {
             val intCodeComputer = IntCodeComputer(input)
             val output: MutableList<Long> = ArrayList()
+            val outputHandler = OutputHandler(output) {
+                output.size == 2
+            }
 
             // false = black
             // also I'm lazy thus this large grid
@@ -32,7 +35,7 @@ class Day11 {
                 }
             }
 
-            paintGrid(grid, intCodeComputer, output)
+            paintGrid(grid, intCodeComputer, outputHandler)
 
             return grid.sumBy {
                 it.count { color -> color.hasBeenPainted }
@@ -42,6 +45,9 @@ class Day11 {
         fun solveDay11Part2(input: List<Long>) {
             val intCodeComputer = IntCodeComputer(input)
             val output: MutableList<Long> = ArrayList()
+            val outputHandler = OutputHandler(output) {
+                output.size == 2
+            }
 
             // false = black
             // also I'm lazy thus this large grid
@@ -53,7 +59,7 @@ class Day11 {
 
             grid[500][500].color = Color.WHITE
 
-            paintGrid(grid, intCodeComputer, output)
+            paintGrid(grid, intCodeComputer, outputHandler)
 
             for (y in grid) {
                 val currLine = StringBuilder()
@@ -64,7 +70,7 @@ class Day11 {
             }
         }
 
-        private fun paintGrid(grid: Array<Array<GridElement>>, intCodeComputer: IntCodeComputer, output: MutableList<Long>) {
+        private fun paintGrid(grid: Array<Array<GridElement>>, intCodeComputer: IntCodeComputer, outputHandler: OutputHandler) {
             var currLocation = Pair(500, 500)
             var direction = Direction.TOP
 
@@ -72,17 +78,14 @@ class Day11 {
                 val currGridValue = grid[currLocation.second][currLocation.first]
                 val currColor = if (currGridValue.color == Color.WHITE) 1L else 0L
 
-                val actuallyQuit = intCodeComputer.run(mutableListOf(currColor), output)
-                if (actuallyQuit) break
+                val halted = intCodeComputer.run(mutableListOf(currColor), outputHandler)
+                if (halted) break
 
-                val actuallyQuit2 = intCodeComputer.run(mutableListOf(), output)
-                if (actuallyQuit2) break
-
-                val newColor = output[0]
+                val newColor = outputHandler.outputList[0]
                 grid[currLocation.second][currLocation.first].color = if (newColor == 0L) Color.BLACK else Color.WHITE
                 grid[currLocation.second][currLocation.first].hasBeenPainted = true
 
-                val newDirection = if (output[1] == 0L) Direction.LEFT else Direction.RIGHT
+                val newDirection = if (outputHandler.outputList[1] == 0L) Direction.LEFT else Direction.RIGHT
                 direction = rotate(direction, newDirection)
 
                 currLocation = when (direction) {
@@ -92,7 +95,7 @@ class Day11 {
                     Direction.LEFT -> currLocation.copy(first = currLocation.first - 1)
                 }
 
-                output.clear()
+                outputHandler.outputList.clear()
             }
         }
 

@@ -10,12 +10,16 @@ class Day7 {
             getPermutations(5, mutableListOf(0, 1, 2, 3, 4), permutations)
 
             val outputList = ArrayList<Long>()
+            val outputHandler = OutputHandler(outputList) {
+                true
+            }
+
             var largestSignal = 0L
 
             permutations.forEach {
                 it.add(1, 0)
                 for (i in 0..4) {
-                    IntCodeComputer(input).run(it, outputList)
+                    IntCodeComputer(input).run(it, outputHandler)
                     val lastOutput = outputList.last()
                     if (i == 4) {
                         if (largestSignal < lastOutput) {
@@ -37,6 +41,10 @@ class Day7 {
             getPermutations(5, mutableListOf(5, 6, 7, 8, 9), permutations)
 
             val outputList = ArrayList<Long>()
+            val outputHandler = OutputHandler(outputList) {
+                true
+            }
+
             var largestSignal = 0L
 
             for (permutation in permutations) {
@@ -49,7 +57,7 @@ class Day7 {
                 permutation.add(1, 0)
                 loop@ while (true) {
                     for (i in 0..4) {
-                        val stopped = intCodeComputers[i].run(permutation, outputList)
+                        val stopped = intCodeComputers[i].run(permutation, outputHandler)
 
                         val lastOutput = outputList.last()
                         if (stopped) {
@@ -103,6 +111,6 @@ fun main() {
         inputList.add(input.nextLong())
     }
 
-//    Day7.solveDay7Part1(inputList)
+    Day7.solveDay7Part1(inputList)
     Day7.solveDay7Part2(inputList)
 }

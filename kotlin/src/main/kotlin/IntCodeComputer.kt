@@ -1,3 +1,8 @@
+class OutputHandler(
+    val outputList: MutableList<Long>,
+    val outputFunc: (cpu: IntCodeComputer) -> Boolean // does it break
+)
+
 class IntCodeComputer(input: List<Long>) {
     var ip = 0L
     var base = 0L
@@ -7,7 +12,7 @@ class IntCodeComputer(input: List<Long>) {
     /**
      * Retuns true if it ended normally
      */
-    fun run(arguments: MutableList<Long>, writeOutputTo: MutableList<Long>?): Boolean {
+    fun run(arguments: MutableList<Long>, outputHandler: OutputHandler?): Boolean {
 
         while (ip < newList.size) {
             val opcodeAndType = getIndex(ip).toString().padStart(5, '0')
@@ -34,8 +39,7 @@ class IntCodeComputer(input: List<Long>) {
                         setIndex(loc1, arguments[0])
                         arguments.removeAt(0)
                     } else {
-                        println("Input:")
-                        setIndex(loc1, readLine()!!.toLong())
+                        return false
                     }
 
                     ip += 2
@@ -45,12 +49,15 @@ class IntCodeComputer(input: List<Long>) {
 
                     ip += 2
 
-                    if (writeOutputTo != null) {
-                        writeOutputTo.add(val1)
-                        return false
+                    if (outputHandler != null) {
+                        outputHandler.outputList.add(val1)
+                        if (outputHandler.outputFunc(this)) {
+                            return false
+                        }
+                    } else {
+                        println(val1)
                     }
 
-                    println(val1)
                 }
                 5 -> {
                     val val1 = getVal(opcodeAndType, ip + 1, 2)
