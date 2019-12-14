@@ -1,4 +1,4 @@
-pub fn part1(pixels: &Vec<[[u32; 6]; 25]>) -> usize {
+pub fn part1(pixels: &[[[u32; 6]; 25]]) -> usize {
     let min_pixels = pixels
         .iter()
         .map(|it| it.iter().flatten())
@@ -10,7 +10,7 @@ pub fn part1(pixels: &Vec<[[u32; 6]; 25]>) -> usize {
     one_digits * two_digits
 }
 
-pub fn part2(pixels: &Vec<[[u32; 6]; 25]>) -> String {
+pub fn part2(pixels: &[[[u32; 6]; 25]]) -> String {
 
     let mut output = String::new();
 
@@ -45,7 +45,7 @@ fn parse_input(string: &str) -> Vec<[[u32; 6]; 25]> {
     let mut curr_y = 0;
     let mut curr_layer = 0;
 
-    for (i, c) in string.trim().chars().enumerate() {
+    for (_i, c) in string.trim().chars().enumerate() {
         layer_xy.get_mut(curr_layer).unwrap()[curr_x][curr_y] = c.to_digit(10).expect("Oof");
 
         curr_x += 1;

@@ -40,7 +40,7 @@ fn compute(elements: &HashMap<&str, CreatedElement>, amount: i64) -> i64 {
     root_elements.get("ORE").unwrap().0
 }
 
-fn get_input_elements<'a>(elements: &'a HashMap<&'a str, CreatedElement>, mut root_elements: &mut HashMap<&'a str, (i64, i64)>, created_element: &'a CreatedElement, amount: i64) {
+fn get_input_elements<'a>(elements: &'a HashMap<&'a str, CreatedElement>, root_elements: &mut HashMap<&'a str, (i64, i64)>, created_element: &'a CreatedElement, amount: i64) {
     let multiply = (amount + created_element.output_amount - 1) / created_element.output_amount;
 
     for el in &created_element.input_elements {
@@ -57,9 +57,9 @@ fn get_input_elements<'a>(elements: &'a HashMap<&'a str, CreatedElement>, mut ro
             }
         };
 
-        if el.1 != "ORE".to_string() {
-            let curr_element = elements.get(name).unwrap();
-            let root_element = root_elements.get(name).unwrap();
+        if el.1 != "ORE" {
+            let curr_element = &elements[name];
+            let root_element = root_elements[name];
 
             let next_created_amount = (required_new_amount + curr_element.output_amount - 1) / curr_element.output_amount;
             let mut left_over = (curr_element.output_amount * next_created_amount) - required_new_amount + root_element.1;
@@ -83,36 +83,21 @@ fn parse_input(input: &str) -> HashMap<&str, CreatedElement> {
         .trim()
         .lines()
         .map(|line| {
-            let splitted: Vec<&str> = line.split(" => ").collect();
+            let splitted: Vec<_> = line.split(" => ").collect();
 
-            let requires_elements: Vec<(i64, String)> = splitted
-                .get(0)
-                .unwrap()
-                .split(", ")
-                .collect::<Vec<&str>>()
-                .iter()
-                .map(|el| {
-                    let el_amount: Vec<&str> = el
-                        .split(" ")
-                        .collect();
+            let requires_elements = splitted[0].split(", ").map(|el| {
+                let el_amount: Vec<_> = el.split_whitespace().collect();
+                let nr = el_amount[0].parse().unwrap();
+                let element = el_amount[1];
+                (nr, element.to_string())
+            }).collect();
 
-                    let nr = el_amount.get(0).unwrap().parse::<i64>().unwrap();
-                    let element = el_amount.get(1).unwrap();
+            let returns: Vec<_> = splitted[1].split_whitespace().collect();
 
-                    (nr, element.to_string())
-                })
-                .collect();
+            let returns_nr = returns[0].parse().unwrap();
+            let returns_element = returns[1];
 
-            let returns: Vec<&str> = splitted
-                .get(1)
-                .unwrap()
-                .split(" ")
-                .collect();
-
-            let returns_nr = returns.get(0).unwrap().parse::<i64>().unwrap();
-            let returns_element = returns.get(1).unwrap();
-
-            (*returns_element, CreatedElement {
+            (returns_element, CreatedElement {
                 output_name: returns_element.to_string(),
                 output_amount: returns_nr,
                 input_elements: requires_elements
@@ -165,7 +150,7 @@ mod tests {
 
     #[test]
     fn p2() {
-        let mut input = parse_input(include_str!("day14"));
+        let input = parse_input(include_str!("day14"));
         let i = part2(&input);
         assert_eq!(i, 6226152);
     }

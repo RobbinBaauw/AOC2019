@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 use std::cmp::Ordering::Equal;
 
-pub fn part1(pixels: &Vec<(isize, isize)>) -> usize {
+pub fn part1(pixels: &[(isize, isize)]) -> usize {
 
     let mut max_asteroids = 0;
 
@@ -14,10 +14,8 @@ pub fn part1(pixels: &Vec<(isize, isize)>) -> usize {
             }
 
             for pixel3 in pixels {
-                if pixel != pixel3 && pixel2 != pixel3 {
-                    if is_in_line(pixel, pixel2, pixel3) {
-                        continue 'outer;
-                    }
+                if pixel != pixel3 && pixel2 != pixel3 && is_in_line(pixel, pixel2, pixel3) {
+                    continue 'outer;
                 }
             }
 
@@ -35,7 +33,7 @@ pub fn part1(pixels: &Vec<(isize, isize)>) -> usize {
 pub fn part2(pixels: &mut Vec<(isize, isize)>, start_pixel: (isize, isize)) -> Option<isize> {
 
     let mut angles: Vec<(f64, isize, (isize, isize))> = vec![];
-    for (i, pixel) in pixels.iter().enumerate() {
+    for (_i, pixel) in pixels.iter().enumerate() {
         if pixel == &start_pixel {
             continue;
         }
@@ -85,7 +83,7 @@ pub fn part2(pixels: &mut Vec<(isize, isize)>, start_pixel: (isize, isize)) -> O
         loop {
             let next_angle = angles.get(angle_index)?.0;
 
-            if curr_angle != next_angle {
+            if (curr_angle - next_angle).abs() > std::f64::EPSILON {
                 break;
             }
 
