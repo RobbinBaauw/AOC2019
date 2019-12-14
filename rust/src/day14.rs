@@ -2,51 +2,80 @@ use std::collections::HashMap;
 
 struct CreatedElement {
     output_name: String,
-    output_amount: isize,
-    input_elements: Vec<(isize, String)>
+    output_amount: i64,
+    input_elements: Vec<(i64, String)>
 }
 
-fn part1(elements: &HashMap<&str, CreatedElement>) -> isize {
-    let mut root_elements: HashMap<&str, isize> = HashMap::new();
-    get_input_elements(elements, &mut root_elements, elements.get("FUEL").unwrap(), 1);
-    root_elements
-        .iter()
-        .map(|el| {
-            let curr_el = elements.get(el.0).unwrap();
-            let created = curr_el.output_amount;
-            let multiply = (el.1 + created - 1) / created;
-
-            let ore = curr_el.input_elements.get(0).unwrap(); // ore
-            ore.0 * multiply
-        })
-        .sum()
+fn part1(elements: &HashMap<&str, CreatedElement>) -> i64 {
+    compute(elements, 1)
 }
 
-fn get_input_elements<'a>(elements: &'a HashMap<&'a str, CreatedElement>, mut root_elements: &mut HashMap<&'a str, isize>, created_element: &'a CreatedElement, amount: isize) {
-    let multiply = (amount + created_element.output_amount - 1) / created_element.output_amount;
+fn part2(elements: &HashMap<&str, CreatedElement>) -> i64 {
+    let min_fuel = 1000000000000 / compute(elements, 1);
 
-    for el in created_element.input_elements.iter() {
-        if el.1 == "ORE".to_string() {
-            let name = created_element.output_name.as_str();
+    search(min_fuel, min_fuel * 2, elements)
+}
 
-            match root_elements.get_mut(name) {
-                None => {
-                    root_elements.insert(name, amount);
-                },
-                Some(curr_count) => {
-                    *curr_count += amount;
-                }
-            };
-
-        } else {
-            let curr_element = elements.get(el.1.as_str()).unwrap();
-            get_input_elements(elements, root_elements, curr_element, el.0 * multiply);
+fn search(min: i64, max: i64, elements: &HashMap<&str, CreatedElement>) -> i64 {
+    if min == max {
+        if compute(elements, min) > 1000000000000 {
+            return min - 1;
         }
+        return min;
+    }
+
+    let mid = (min + max) / 2;
+    let required_ores = compute(elements, mid);
+    
+    match required_ores {
+        required_ores if required_ores > 1000000000000 => search(min, mid, elements),
+        required_ores if required_ores < 1000000000000 => search(mid + 1, max, elements),
+        _ => mid
     }
 }
 
-fn part2(pixels: &mut Vec<(isize, isize)>, start_pixel: (isize, isize)) -> isize {
-    2
+fn compute(elements: &HashMap<&str, CreatedElement>, amount: i64) -> i64 {
+    let mut root_elements: HashMap<&str, (i64, i64)> = HashMap::new();
+    get_input_elements(elements, &mut root_elements, elements.get("FUEL").unwrap(), amount);
+    root_elements.get("ORE").unwrap().0
+}
+
+fn get_input_elements<'a>(elements: &'a HashMap<&'a str, CreatedElement>, mut root_elements: &mut HashMap<&'a str, (i64, i64)>, created_element: &'a CreatedElement, amount: i64) {
+    let multiply = (amount + created_element.output_amount - 1) / created_element.output_amount;
+
+    for el in &created_element.input_elements {
+
+        let name = el.1.as_str();
+        let mut required_new_amount = el.0 * multiply;
+
+        match root_elements.get_mut(name) {
+            None => {
+                root_elements.insert(name, (required_new_amount, 0));
+            },
+            Some(curr_count) => {
+                *curr_count = (curr_count.0 + required_new_amount, curr_count.1);
+            }
+        };
+
+        if el.1 != "ORE".to_string() {
+            let curr_element = elements.get(name).unwrap();
+            let root_element = root_elements.get(name).unwrap();
+
+            let next_created_amount = (required_new_amount + curr_element.output_amount - 1) / curr_element.output_amount;
+            let mut left_over = (curr_element.output_amount * next_created_amount) - required_new_amount + root_element.1;
+
+            if left_over < 0 {
+                panic!();
+            } else if left_over >= curr_element.output_amount {
+                required_new_amount -= curr_element.output_amount;
+                left_over -= curr_element.output_amount;
+            }
+
+            root_elements.insert(name, (root_element.0, left_over));
+
+            get_input_elements(elements, root_elements, curr_element, required_new_amount);
+        }
+    }
 }
 
 fn parse_input(input: &str) -> HashMap<&str, CreatedElement> {
@@ -56,7 +85,7 @@ fn parse_input(input: &str) -> HashMap<&str, CreatedElement> {
         .map(|line| {
             let splitted: Vec<&str> = line.split(" => ").collect();
 
-            let requires_elements: Vec<(isize, String)> = splitted
+            let requires_elements: Vec<(i64, String)> = splitted
                 .get(0)
                 .unwrap()
                 .split(", ")
@@ -67,7 +96,7 @@ fn parse_input(input: &str) -> HashMap<&str, CreatedElement> {
                         .split(" ")
                         .collect();
 
-                    let nr = el_amount.get(0).unwrap().parse::<isize>().unwrap();
+                    let nr = el_amount.get(0).unwrap().parse::<i64>().unwrap();
                     let element = el_amount.get(1).unwrap();
 
                     (nr, element.to_string())
@@ -80,7 +109,7 @@ fn parse_input(input: &str) -> HashMap<&str, CreatedElement> {
                 .split(" ")
                 .collect();
 
-            let returns_nr = returns.get(0).unwrap().parse::<isize>().unwrap();
+            let returns_nr = returns.get(0).unwrap().parse::<i64>().unwrap();
             let returns_element = returns.get(1).unwrap();
 
             (*returns_element, CreatedElement {
@@ -101,7 +130,7 @@ mod tests {
         let input = parse_input(include_str!("day14"));
         let i = part1(&input);
         println!("{}", i);
-        assert_eq!(i, 221);
+        assert_eq!(i, 178154);
     }
 
     #[test]
@@ -136,8 +165,8 @@ mod tests {
 
     #[test]
     fn p2() {
-//        let mut input = parse_input(include_str!("day14"));
-//        let i = part2(input, (11, 11));
-//        assert_eq!(i, 806);
+        let mut input = parse_input(include_str!("day14"));
+        let i = part2(&input);
+        assert_eq!(i, 6226152);
     }
 }

@@ -10,43 +10,37 @@ class CreatedElement(
 class Day14 {
     companion object {
         fun solveDay14Part1(elements: Map<String, CreatedElement>): Long {
-
-            // Pair<Created, Left>
-            val requiredMapping: MutableMap<String, Pair<Long, Long>> = HashMap()
-
-            getInputElements(elements, requiredMapping, elements["FUEL"]!!, 1)
-
-            return requiredMapping["ORE"]!!.first
+            return compute(elements, 1)
         }
 
         fun solveDay14Part2(elements: Map<String, CreatedElement>): Long {
-
-            val requiredMapping: MutableMap<String, Pair<Long, Long>> = HashMap()
-            getInputElements(elements, requiredMapping, elements["FUEL"]!!, 1)
-            val minFuel = 1000000000000L / requiredMapping["ORE"]!!.first
-
+            val minFuel = 1000000000000L / compute(elements, 1)
             return search(minFuel, minFuel * 2, elements)
         }
 
         private fun search(min: Long, max: Long, elements: Map<String, CreatedElement>): Long {
 
             if (min == max) {
-                return min
+                if (compute(elements, 1) > 1000000000000L) {
+                    return min -1
+                }
+                return min - 1
             }
 
             val mid = (min + max) / 2
+            val requiredOre = compute(elements, mid)
 
-            val requiredMapping: MutableMap<String, Pair<Long, Long>> = HashMap()
-            getInputElements(elements, requiredMapping, elements["FUEL"]!!, mid)
-            val requiredOre = requiredMapping["ORE"]!!.first
-
-            return if (requiredOre > 1000000000000L) {
-                search(min, mid, elements)
-            } else if (requiredOre < 1000000000000L) {
-                search(mid + 1, max, elements)
-            } else {
-                mid
+            return when {
+                requiredOre > 1000000000000L -> search(min, mid, elements)
+                requiredOre < 1000000000000L -> search(mid + 1, max, elements)
+                else -> mid
             }
+        }
+
+        private fun compute(elements: Map<String, CreatedElement>, amount: Long): Long {
+            val requiredMapping: MutableMap<String, Pair<Long, Long>> = HashMap()
+            getInputElements(elements, requiredMapping, elements["FUEL"]!!, amount)
+            return requiredMapping["ORE"]!!.first
         }
 
         private fun getInputElements(elements: Map<String, CreatedElement>, requiredMapping: MutableMap<String, Pair<Long, Long>>, rootElement: CreatedElement, amount: Long) {
