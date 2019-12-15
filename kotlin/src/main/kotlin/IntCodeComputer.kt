@@ -100,6 +100,13 @@ class IntCodeComputer(input: List<Long>) {
         return true
     }
 
+    fun clone(): IntCodeComputer {
+        val computer = IntCodeComputer(newList)
+        computer.base = this.base
+        computer.ip = this.ip
+        return computer
+    }
+
     private fun getVal(
         opcodeAndType: String,
         i: Long,

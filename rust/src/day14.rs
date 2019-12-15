@@ -65,7 +65,7 @@ fn get_input_elements<'a>(elements: &'a HashMap<&'a str, CreatedElement>, root_e
             let mut left_over = (curr_element.output_amount * next_created_amount) - required_new_amount + root_element.1;
 
             if left_over < 0 {
-                panic!();
+                unreachable!();
             } else if left_over >= curr_element.output_amount {
                 required_new_amount -= curr_element.output_amount;
                 left_over -= curr_element.output_amount;
