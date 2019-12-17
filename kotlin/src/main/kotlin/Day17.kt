@@ -17,7 +17,17 @@ data class GridPoint(
 data class Path(
     val length: Int,
     val startingTurn: Direction
-)
+) {
+    override fun toString(): String {
+        val dirString = when (startingTurn) {
+            Direction.LEFT -> "L"
+            Direction.RIGHT -> "R"
+            else -> throw Exception()
+        }
+
+        return "$dirString,$length"
+    }
+}
 
 enum class PointType {
     SCAFFOLD,
@@ -121,13 +131,43 @@ class Day17(
             currDirection = currRotation
         }
 
-        val path1 = "L,6,R,12,L,6"
-        val path2 = "R,12,L,10,L,4,L,6"
-        val path3 = "L,10,L,10,L,4,L,6"
+        println(paths)
+        println(takenPaths)
 
-        val finalPath = "A,B,A,B,A,C,B,C,A,C"
+        // TakenPaths refers to indices of paths. TakenPaths needs to be permuted into 3 re-used sublists when can then be transformed into paths
+        // Done manually here to save time
+        val pathAIndices = listOf(0, 1, 0)
+        val pathBIndices = listOf(1, 2, 3, 0)
+        val pathCIndices = listOf(2, 2, 3, 0)
 
-        val pathStrings = mutableListOf(finalPath, path1, path2, path3, "n", "")
+        val pathAIndicesJoined = pathAIndices.joinToString("")
+        val pathBIndicesJoined = pathBIndices.joinToString("")
+        val pathCIndicesJoined = pathCIndices.joinToString("")
+
+        val pathA = pathAIndices.joinToString(",") { paths[it].toString() }
+        val pathB = pathBIndices.joinToString(",") { paths[it].toString() }
+        val pathC = pathCIndices.joinToString(",") { paths[it].toString() }
+
+        val finalPath: MutableList<String> = ArrayList()
+        var pathsToTake = takenPaths.joinToString("")
+        while (pathsToTake.isNotBlank()) {
+            when {
+                pathsToTake.startsWith(pathAIndicesJoined) -> {
+                    finalPath.add("A")
+                    pathsToTake = pathsToTake.removePrefix(pathAIndicesJoined)
+                }
+                pathsToTake.startsWith(pathBIndicesJoined) -> {
+                    finalPath.add("B")
+                    pathsToTake = pathsToTake.removePrefix(pathBIndicesJoined)
+                }
+                else -> {
+                    finalPath.add("C")
+                    pathsToTake = pathsToTake.removePrefix(pathCIndicesJoined)
+                }
+            }
+        }
+
+        val pathStrings = mutableListOf(finalPath.joinToString(","), pathA, pathB, pathC, "n", "")
 
         val changedInput = input.toMutableList()
         changedInput[0] = 2L
