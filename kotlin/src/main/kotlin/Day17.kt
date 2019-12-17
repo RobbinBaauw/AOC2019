@@ -131,38 +131,32 @@ class Day17(
             currDirection = currRotation
         }
 
-        println(paths)
-        println(takenPaths)
+        val pathString = takenPaths.joinToString("")
+        val pathIndices = getPathFragments(pathString, mutableListOf()) ?: throw Exception()
 
-        // TakenPaths refers to indices of paths. TakenPaths needs to be permuted into 3 re-used sublists when can then be transformed into paths
-        // Done manually here to save time
-        val pathAIndices = listOf(0, 1, 0)
-        val pathBIndices = listOf(1, 2, 3, 0)
-        val pathCIndices = listOf(2, 2, 3, 0)
+        val pathAIndicesJoined = pathIndices[0]
+        val pathBIndicesJoined = pathIndices[1]
+        val pathCIndicesJoined = pathIndices[2]
 
-        val pathAIndicesJoined = pathAIndices.joinToString("")
-        val pathBIndicesJoined = pathBIndices.joinToString("")
-        val pathCIndicesJoined = pathCIndices.joinToString("")
-
-        val pathA = pathAIndices.joinToString(",") { paths[it].toString() }
-        val pathB = pathBIndices.joinToString(",") { paths[it].toString() }
-        val pathC = pathCIndices.joinToString(",") { paths[it].toString() }
+        val pathA = pathAIndicesJoined.toCharArray().map { Character.getNumericValue(it) }.joinToString(",") { paths[it].toString() }
+        val pathB = pathBIndicesJoined.toCharArray().map { Character.getNumericValue(it) }.joinToString(",") { paths[it].toString() }
+        val pathC = pathCIndicesJoined.toCharArray().map { Character.getNumericValue(it) }.joinToString(",") { paths[it].toString() }
 
         val finalPath: MutableList<String> = ArrayList()
         var pathsToTake = takenPaths.joinToString("")
         while (pathsToTake.isNotBlank()) {
-            when {
+            pathsToTake = when {
                 pathsToTake.startsWith(pathAIndicesJoined) -> {
                     finalPath.add("A")
-                    pathsToTake = pathsToTake.removePrefix(pathAIndicesJoined)
+                    pathsToTake.removePrefix(pathAIndicesJoined)
                 }
                 pathsToTake.startsWith(pathBIndicesJoined) -> {
                     finalPath.add("B")
-                    pathsToTake = pathsToTake.removePrefix(pathBIndicesJoined)
+                    pathsToTake.removePrefix(pathBIndicesJoined)
                 }
                 else -> {
                     finalPath.add("C")
-                    pathsToTake = pathsToTake.removePrefix(pathCIndicesJoined)
+                    pathsToTake.removePrefix(pathCIndicesJoined)
                 }
             }
         }
@@ -178,6 +172,37 @@ class Day17(
 
         intCodeComputer2.run(pathStrings.joinToString("\n").map { it.toLong() }.toMutableList(), outputHandler2)
         return outputHandler2.outputList.last()
+    }
+
+    private fun getPathFragments(currPath: String, previousFragments: List<String>): List<String>? {
+        for (fragmentIndex in 0..4) {
+            var copyPathString = currPath
+            val newFragment = currPath.substring(0..fragmentIndex)
+
+            copyPathString = copyPathString.removePrefix(newFragment)
+
+            val newFragments = previousFragments.toMutableList()
+            newFragments.add(newFragment)
+
+            var startsWith = newFragments.firstOrNull { copyPathString.startsWith(it) }
+            while (startsWith != null) {
+                copyPathString = copyPathString.removePrefix(startsWith)
+                startsWith = newFragments.firstOrNull { copyPathString.startsWith(it) }
+            }
+
+            if (newFragments.size == 3) {
+                if (copyPathString.isBlank()) {
+                    return newFragments
+                }
+            } else {
+                val childResult = getPathFragments(copyPathString, newFragments)
+                if (childResult != null) {
+                    return childResult
+                }
+            }
+        }
+
+        return null
     }
 
     private fun requiredDirection(direction: Direction, newDirection: Direction): Direction {
@@ -266,6 +291,6 @@ fun main() {
         inputList.add(input.nextLong())
     }
 
-//    println(Day17(inputList).solveDay17Part1())
+    println(Day17(inputList).solveDay17Part1())
     println(Day17(inputList).solveDay17Part2())
 }
