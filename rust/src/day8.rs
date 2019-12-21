@@ -74,7 +74,6 @@ mod tests {
     fn p1() {
         let input = parse_input(include_str!("day8"));
         let i = part1(&input);
-        println!("{}", i);
         assert_eq!(i, 1950);
     }
 
@@ -82,7 +81,6 @@ mod tests {
     fn p2() {
         let input = parse_input(include_str!("day8"));
         let i = part2(&input);
-        println!("{}", i);
         assert_eq!(i, "fd");
     }
 

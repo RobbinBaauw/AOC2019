@@ -114,7 +114,6 @@ mod tests {
     fn p1() {
         let input = parse_input(include_str!("day14"));
         let i = part1(&input);
-        println!("{}", i);
         assert_eq!(i, 178154);
     }
 
@@ -128,7 +127,6 @@ mod tests {
 4 C, 1 A => 1 CA
 2 AB, 3 BC, 4 CA => 1 FUEL");
         let i = part1(&input);
-        println!("{}", i);
         assert_eq!(i, 165);
     }
 
@@ -144,7 +142,6 @@ mod tests {
 165 ORE => 2 GPVTF
 3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT");
         let i = part1(&input);
-        println!("{}", i);
         assert_eq!(i, 13312);
     }
 

@@ -78,8 +78,6 @@ fn solve(input: &str, ignore_depth: bool) -> i64 {
     visited.extend(&zero_neighbours);
     visited.insert(((vec1[0].0).0, (vec1[0].0).1, 0));
 
-    let end = parsed_portals_str[&"ZZ".to_string()][0];
-
     let mut distance = 0;
     while !to_visit.is_empty() {
         let mut new_coordinates: HashSet<(i64, i64, u64)> = HashSet::new();
