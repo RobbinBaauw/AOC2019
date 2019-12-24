@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 mod_exp = "1.0.1"
+arrayvec = "0.5.1"
+

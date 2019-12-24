@@ -10,6 +10,7 @@ mod day16;
 mod day18;
 mod day20;
 mod day22;
+mod day24;
 
 fn main() -> Result<(), Box<dyn Error>> {
     Ok(())

@@ -59,7 +59,7 @@ pub fn part2(input: &str) -> i128 {
 
     let i0 = offset;
     let i1 = inv((1 - increment) % cards);
-    let i2 = (1 - final_increment);
+    let i2 = 1 - final_increment;
 
     let mut final_offset: i128 = i0 * i1 * i2;
     final_offset %= cards;
